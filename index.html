@@ -1,211 +1,306 @@
 <!DOCTYPE HTML>
 <html lang="ja">
-  <head>
-    <meta charset="UTF-8">
-    <title>Remaining Time</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="https://raw.githubusercontent.com/yuuu-000/remainingtime/main/remainingtime_favicon.png">
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Remaining Time">
-    <meta name="twitter:description" content="講義の残り時間表示させるページ作った PiPにも対応してるかも(環境次第)">
-    <meta name="twitter:image:src" content="https://raw.githubusercontent.com/yuuu-000/remainingtime/main/Twitter_card.jpg">
-    <meta name="twitter:domain" content="github.io">
-    <!-- Chivo Mono フォント -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Chivo+Mono:ital,wght@0,100..900;1,100..900&family=Edu+VIC+WA+NT+Beginner:wght@400;700&family=Fjalla+One&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-    <!-- Sawarabi Gothic フォント -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Sawarabi+Gothic&display=swap" rel="stylesheet">
-    <!-- isBetweenTimes関数の定義 -->
-    <script>
-      function isBetweenTimes(now, startTime, endTime) {
-        const start = new Date(now.toDateString() + ' ' + startTime);
-        const end = new Date(now.toDateString() + ' ' + endTime);
-        return now >= start && now <= end;
-      }
-    </script>
-    <style>
-      body {
-        background-color: #000;
-        width: 100%;
-        height: 100%;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        }
+    <head>
+      <meta charset="UTF-8">
+      <title>Remaining Time</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link rel="icon" href="./remainingtime_favicon.png">
+      <meta name="twitter:card" content="summary">
+      <meta name="twitter:title" content="Remaining Time">
+      <meta name="twitter:description" content="講義の残り時間表示させるページ作った PiPにも対応してるかも(環境次第)">
+      <meta name="twitter:image:src" content="./Twitter_card.jpg">
+      <meta name="twitter:domain" content="github.io">
+      <!-- Chivo Mono フォント -->
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Chivo+Mono:ital,wght@0,100..900;1,100..900&family=Edu+VIC+WA+NT+Beginner:wght@400;700&family=Fjalla+One&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+      <!-- Sawarabi Gothic フォント -->
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Sawarabi+Gothic&display=swap" rel="stylesheet">
+      <!-- Ysabeau Infant フォント -->
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Ysabeau+Infant:ital,wght@0,1..1000;1,1..1000&display=swap" rel="stylesheet">
+      <style>
+        ::selection { 
+          background-color: #4a87dd; color: #fff58c; 
+          }
 
-      button {
-        color: #000;
-        letter-spacing: 2.5px;
-        font-size: calc(0.8vw + 0.8rem);
-        font-weight: bold;
-        width: 100%;
-        padding: 0.4em;
-        position: relative;
-        display: block;
-        transition: 0.2s;
-        border: none;
-        background: transparent;
-        }
+        body {
+          background-color: #000;
+          width: 100%;
+          height: 100%;
+          margin: 0;
+          padding: 0;
+          }
 
-      button::before {
-        content: "";
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        top: 0;
-        left: 0;
-        border: 3px solid #9aa9b3;
-        border-radius: 35px;
-        box-sizing: border-box;
-        transform: scale(0);
-        opacity: 0;
-        transition: transform ease-out 0.3s, opacity 0.5s;
-        }
+        button {
+          color: #000;
+          letter-spacing: 2px;
+          font-size: calc(0.8vw + 0.8rem);
+          font-weight: bold;
+          width: 100%;
+          padding: 0.4em;
+          position: relative;
+          display: block;
+          transition: 0.2s;
+          border: none;
+          background: transparent;
+          }
 
-      button:hover {
-        color: #9aa9b3;
-        }
+        button::before {
+          content: "";
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          top: 0;
+          left: 0;
+          border: 3px solid #9aa9b3;
+          border-radius: 35px;
+          box-sizing: border-box;
+          transform: scale(0);
+          opacity: 0;
+          transition: transform ease-out 0.3s, opacity 0.5s;
+          }
 
-      button:hover::before {
-        transform: scale(1);
-        opacity: 1;
-        }
+        button:hover {
+          color: #9aa9b3;
+          }
 
-      #pip-button {
-        background: #000;
-        width: 88%;
-        margin: 5vh auto;
-        cursor: pointer;
-        outline: none;
-        -webkit-tap-highlight-color: transparent;
-        }
+        button:hover::before {
+          transform: scale(1);
+          opacity: 1;
+          }
 
-      #day, #countdown {
-        width: 100%;
-        margin: 0 auto;
-        text-align: center;
-        font-family: "Chivo Mono", "Sawarabi Gothic", monospace;
-        }
+        #pip-button {
+          background: #000;
+          width: 88%;
+          margin: 5vh auto;
+          cursor: pointer;
+          outline: none;
+          -webkit-tap-highlight-color: transparent;
+          }
 
-      #day {
-        font-size: calc(0.1vw + 1.1rem);
-        font-weight: 400;
-        letter-spacing: -0.055em;
-        }
+        #day, #countdown {
+          text-align: center;
+          font-family: "Chivo Mono", "Sawarabi Gothic", monospace;
+          }
 
-      #countdown {
-        font-size: calc(3.3vw + 1rem);
-        font-weight: 800; 
-        letter-spacing: 0.06em;
-        }
+        #day {
+          font-size: calc(0.1vw + 1.1rem);
+          font-weight: 400;
+          letter-spacing: -0.055em;
+          }
 
-      #box {
-        color: #dedede;
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        display: flex;
-        flex-direction: column;        
-        justify-content: center;     
-        width: 100%;
-        height: 15%;
-        line-height: 1.3;
-        cursor: cell;
-        }
-    </style>
-  </head>
+        #countdown {
+          font-size: calc(3.3vw + 1rem);
+          font-weight: 800; 
+          letter-spacing: 0.06em;
+          }
+
+        #box, #pipactive {
+          color: #dedede;
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);  
+          width: 100%;
+          line-height: 1.3;
+          cursor: cell;
+          }
+
+        #pipactive {
+          color: #dedede;
+          font-size: calc(1.3vw + 0.5rem);
+          font-weight: 600; 
+          font-family: "Ysabeau Infant", monospace;   
+          letter-spacing: -0.03em;
+          text-align: center;
+          }
+      </style>
+    </head>
   <body>
 
-    <button id="pip-button" title="PiP Mode Button">PiP Open</button>
+      <button id="pip-button">PiP Open</button>
     
       <div id="box">
         <div id="day"></div>
-        <div id="countdown"></div>
+        <div id="countdown"></div> 
       </div>
+      <div id="pipactive"></div>
 
-    <script type="text/javascript">
-        setInterval(function(){
+      <script type="text/javascript">
+        // #region CurrentTime 
+        const day = document.getElementById("day");
+          
+          setInterval(function() {
+            const date = new Date()
+            const A =
+                          date.getFullYear() + "-" +
+                  ("0" + (date.getMonth() + 1)).slice(-2) + "-" +
+                  ("0" +  date.getDate()).slice(-2) + " "               // 西暦,月,日 一桁の時に0埋め
+                  
+            const B =
+                  (date.getDay());
+            const C = 
+                  ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][B]; //　曜日を対応させる
 
-        const date = new Date(),
-          A =
-                      date.getFullYear() + '-' +
-              ('0' + (date.getMonth() + 1)).slice(-2) + '-' +
-              ('0' +  date.getDate()).slice(-2) + ' '              //　西暦,月,日 一桁の時に0埋め
+            const D =  " " +
+                  ("0" +  date.getHours()).slice(-2) + ":" +
+                  ("0" +  date.getMinutes()).slice(-2) + ":" +
+                  ("0" +  date.getSeconds()).slice(-2)                  //　時,分,秒 一桁の時に0埋め
               
-          B =
-              (date.getDay());
-          C = 
-              ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][B]; //　曜日を対応させる
+              day.textContent = A + C + D;
+          }, 0);
+          // #endregion
 
-          D =  ' ' +
-              ('0' +  date.getHours()).slice(-2) + ':' +
-              ('0' +  date.getMinutes()).slice(-2) + ':' +
-              ('0' +  date.getSeconds()).slice(-2)                 //　時,分,秒 一桁の時に0埋め
-          
-          document.getElementById("day").textContent = A + C + D;
-        }, 0);   
-    </script>
+          // #region CountdownTimer
+                // ターゲット時間のリスト（時:分:秒）
+                const targetTimes = ["09:00:01", "10:30:01", "10:40:01", "12:10:01", "13:10:01", "14:40:01", "14:50:01", "16:20:01", "16:30:01", "18:00:01", "24:00:00"];
+                // それぞれのターゲット時間に対応する文
+                const messages = ["1限開始", "1限終了", "2限開始", "2限終了", "3限開始", "3限終了", "4限開始", "4限終了", "5限開始", "5限終了", "今日も1日お疲れ様でした"];
 
-    <script type="text/javascript">
-          // ターゲット時間のリスト（時:分:秒）
-          const targetTimes = ["09:00:01", "10:30:01", "10:40:01", "12:10:01", "13:10:01", "14:40:01", "14:50:01", "16:20:01", "16:30:01", "18:00:01", "24:00:00"];
-          // それぞれのターゲット時間に対応する文
-          const messages = ["1限開始", "1限終了", "2限開始", "2限終了", "3限開始", "3限終了", "4限開始", "4限終了", "5限開始", "5限終了", "今日も1日お疲れ様でした"];
+                // 初期化: 最初のカウントダウンを開始
+                startCountdown(0);
 
-          // 初期化: 最初のカウントダウンを開始
-          startCountdown(0);
-
-          function startCountdown(targetTimeIndex) {
-          // 次のターゲット時間を設定
-          const nextTarget = new Date();
-          const [hours, minutes, seconds] = targetTimes[targetTimeIndex].split(":");
-          nextTarget.setHours(parseInt(hours, 10), parseInt(minutes, 10), parseInt(seconds, 10), 0); // 指定された時間に設定
+                function startCountdown(targetTimeIndex) {
+                // 次のターゲット時間を設定
+                const nextTarget = new Date();
+                const [hours, minutes, seconds] = targetTimes[targetTimeIndex].split(":");
+                nextTarget.setHours(parseInt(hours, 10), parseInt(minutes, 10), parseInt(seconds, 10), 0); // 指定された時間に設定
 
 
-          // カウントダウンの処理
-          const countdownInterval = setInterval(function() {
-              const now = new Date();
-              const remain = nextTarget.getTime() - now.getTime();
+                // カウントダウンの処理
+                const countdown = document.getElementById("countdown");
+                const countdownInterval = setInterval(function() {
+                const now = new Date();
+                const remain = nextTarget.getTime() - now.getTime();
 
-            if (remain < 0) {
-                // カウントダウンが終了したときの処理
-                clearInterval(countdownInterval); // カウントダウンを停止
-                const newTargetTimeIndex = (targetTimeIndex + 1) % targetTimes.length; // 次のターゲット時間のインデックスを計算
-                startCountdown(newTargetTimeIndex); // 次のターゲット時間で再帰的にカウントダウンを開始
-            } else {
-                let M = Math.floor( remain/ (1000 * 60)); // ミリ秒から分へ変換
-                let S = Math.floor((remain / 1000) % 60); // ミリ秒から秒へ変換
-                M = M < 10 ? "0" + M : M;
-                S = S < 10 ? "0" + S : S; // 値が一桁の時に0埋め
-                const message = messages[targetTimeIndex]; // カウントダウンが終了した場合に次の文を取得
-          
-            if (isBetweenTimes(now, "18:00:01", "24:00:00")) {
-                    // 18:00:01～23:59:59の場合
-                document.getElementById("countdown").textContent = message;
+              if (remain < 0) {
+                  // カウントダウンが終了したときの処理
+                  clearInterval(countdownInterval); // カウントダウンを停止
+                  const newTargetTimeIndex = (targetTimeIndex + 1) % targetTimes.length; // 次のターゲット時間のインデックスを計算
+                  startCountdown(newTargetTimeIndex); // 次のターゲット時間で再帰的にカウントダウンを開始
               } else {
-                    // それ以外の時間帯の場合
-                document.getElementById("countdown").textContent = message + "まで " + M + ":" + S;
-                  }
+                  let M = Math.floor( remain/ (1000 * 60)); // ミリ秒から分へ変換
+                  let S = Math.floor((remain / 1000) % 60); // ミリ秒から秒へ変換
+                  M = M < 10 ? "0" + M : M;
+                  S = S < 10 ? "0" + S : S; // 値が一桁の時に0埋め
+                  const message = messages[targetTimeIndex]; // カウントダウンが終了した場合に次の文を取得
+            
+              // isBetweenTimes関数の定義
+              function isBetweenTimes(now, startTime, endTime) {
+                const start = new Date(now.toDateString() + " " + startTime);
+                const end = new Date(now.toDateString() + " " + endTime);
+                return now >= start && now <= end;
               }
+      
+              if (isBetweenTimes(now, "18:00:01", "24:00:00")) {
+                      // 18:00:01～23:59:59の場合
+                  countdown.textContent = message;
+                } else {
+                      // それ以外の時間帯の場合
+                  countdown.textContent = message + "まで " + M + ":" + S;
+                    }
+                }
                 }, 0);
-            }
-    </script>
+              }
+          // #endregion
 
-<script type="text/javascript">
- if ("documentPictureInPicture" in window) {
-	 document.getElementById("pip-button").addEventListener("click", () => {
-      alert("available");
-		 });
-} else {
-	 document.getElementById("pip-button").addEventListener("click", () => {
-      alert("SORRY!!");
-		 });
-}
-</script>
+          // #region Picture-in-Picture
+              const pipButton = document.getElementById("pip-button");
+              if ("documentPictureInPicture" in window) {
+          
+                let pipWindow = null;
+                let Container = null;
+          
+              // openの処理
+              async function OpenPiP() {
+                const player = document.querySelector("#box");
+                Container = player.parentNode;
+        
+                pipWindow = await documentPictureInPicture.requestWindow({
+                  width: 350,
+                  height: 150,
+                  disallowReturnToOpener: true,
+                  copyStyleSheets: true
+                });
+        
+                [...document.styleSheets].forEach((styleSheet) => {
+                  try {
+                    const cssRules = [...styleSheet.cssRules].map((rule) => rule.cssText).join("");
+                    const style = document.createElement("style");
+        
+                    style.textContent = cssRules;
+                    pipWindow.document.head.appendChild(style);
+                  } catch (e) {
+                    const link = document.createElement("link");
+        
+                    link.rel = "stylesheet";
+                    link.type = styleSheet.type;
+                    link.media = styleSheet.media;
+                    link.href = styleSheet.href;
+                    pipWindow.document.head.appendChild(link);
+                  }
+                });
+        
+                  pipWindow.document.body.append(player);
+        
+                  pipButton.textContent = "PiP Close";
+                  document.getElementById("pipactive").textContent = "Picture in Picture Mode Is Active Now";
+        
+                  // PiPウインドウ上のxを押された時の処理
+                  pipWindow.addEventListener("unload", ClosePiP.bind(pipWindow), {
+                    once: true
+                  });
+                }
+        
+                  // closeの処理
+                  function ClosePiP() {
+                    if (this !== pipWindow) {
+                      return;
+                    }
+                    const player = pipWindow.document.querySelector("#box");
+                    Container.append(player);
+                    pipWindow.close();
+                    pipButton.textContent = "PiP Open";
+                    document.getElementById("pipactive").textContent = "";
+        
+                    pipWindow = null;
+                    Container = null;
+                }
+        
+                  // ボタンで実行
+                  pipButton.addEventListener("click", () => {
+                    if (!pipWindow) {
+                      OpenPiP();
+                    } else {
+                      ClosePiP.bind(pipWindow)();
+                    }
+                  });
+                } else {
+                  //PiP非対応の処理 
+                  pipButton.addEventListener("click", () => {
+                    alert("SORRY!!   This device does not support PiP😭😭");
+                    pipButton.textContent = "PiP is not available";
+                  });
+                }
+            // #endregion  
+
+            // #region FirstLoad
+                  const explain = "画面上部にPicture in Picture表示にできるボタンが隠れてるから探してね\n\n今後このメッセージを表示しないなら [OK]";
+
+                  window.onload = function() {
+                    if (!localStorage.getItem("FirstLoad")) {
+                        let check = confirm(explain);
+
+                      if (check) {
+                          localStorage.setItem("FirstLoad", true);
+                        }
+                    }
+                  };
+            // #endregion            
+      </script>
   </body>
 </html>
